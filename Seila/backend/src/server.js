@@ -1,9 +1,15 @@
 const express = require('express');
+const routes = require('./routes');
 
 const app = express();
 
-app.get('/',(req,res) =>{
-    return res.json({message :"Hello B2W!"})
-})
+// req.query = acessa query patterns (para filtros)
+// req.params = acessa rout params (para edição, delete)
+// req.body = acessa o corpo da requisição (para criação e edição)
+
+app.use(express.json());
+app.use(routes);
+
+
 
 app.listen(3333);
