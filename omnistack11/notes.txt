@@ -1,0 +1,67 @@
+Links uteis:
+
+notion.so >> Aplicação para anotações online 
+figma.com >> Desenhar layouts de webpages
+jsonviewer + dracula theme >> Extensão para visualização de json no Chrome
+https://www.youtube.com/watch?v=eSjFDWYkdxM >> Instalação e config do Expo
+
+1. Preparação do ambiente:
+
+A) Instalar o gerenciador de pacotes:  https://chocolatey.org/install
+B) Instalar o node.js: https://nodejs.org/en/download/package-manager/#windows
+C) Instalar o vscode
+D) Instalar as extensões: Matherial Icon Theme, Dracula ...
+
+2. Primeiros passos
+
+# Cria o backend NodeJS
+
+cd 'F:\Meus Documentos XP\GitHub\javascript\omnistack11\aulas\backend'
+npm init -y
+npm install express
+node index.js
+
+# Cria o frondend React
+
+cd 'F:\Meus Documentos XP\GitHub\javascript\omnistack11\aulas\'
+npx create-react-app frontend
+cd frontend
+npm start
+
+# Instalar e Configurar o nodemon
+
+npm install nodemon -D
+
+Editar o arquivo package.json e incluir o script '"start": "nodemon index.js"'
+
+# Instalação do Knex e conexão com o banco
+
+npm install knex
+npm install sqlite3
+npx knex init
+
+Acessar o knexfile.js e alterar o caminho 'development' para 'src/databases/db.sqlite3'
+
+# Knex migrations
+
+mkdir ./src/database/migrations
+
+editar o knexfile.js e incluir o bloco a seguir em 'development':
+'''
+migration: {
+  directory: './src/database/migrations'
+}
+useNullAsDefault: true,
+'''
+/* cria a tabela 'create_ongs' e a tabela 'incidents' */
+npx knex migrate:make create_ongs
+npx knex migrate:make incidents
+
+Editar as migrations para configurar os metodos exports.up e exports.down.
+Esses metodos são os responsáveis pela criação e rollback das tabelas (consultar docs)
+Após a edição executar:
+npx knex migrate:latest
+
+
+Parei no minuto 55
+ 
