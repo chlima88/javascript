@@ -1,7 +1,13 @@
+process.env["NTBA_FIX_319"] = 1
+
 require('dotenv').config();
-const TelegramBot = require('node-telegram-bot-api');
 
 const token = process.env.TELEGRAM_TOKEN;
+const TelegramBot = require('node-telegram-bot-api');
+
+//Note: Your Alphavantage API key will be visible in the network traffic, this should not be used for public projects.
+const alphavantage_key = process.env.ALPHAVANTAGE_APIKEY;
+const alpha = require('alphavantage')({key: alphavantage_key})
 
 // Created instance of TelegramBot
 const bot = new TelegramBot(token, {polling: true});
@@ -10,6 +16,30 @@ const bot = new TelegramBot(token, {polling: true});
 const URLs = [];
 const URLLabels = [];
 let tempSiteURL = '';
+
+
+bot.onText(/\/stock (.*)/, (msg, match) =>{
+    
+    const interval = '60min'
+    const chatId = msg.chat.id;
+    const symbol = match[1]+'.SAO'
+
+    alpha.data.intraday(symbol,'','',interval).then(data => { 
+        TimeSeriesKey = Object.keys(data)[1]
+        LastDataKey = Object.keys(data[TimeSeriesKey])[0]
+
+        res = data[TimeSeriesKey][LastDataKey]
+
+        msg = `${symbol.toUpperCase()} - Cotação atual ${res["1. open"]}`
+
+        
+        bot.sendMessage(chatId,msg);
+
+    });
+
+    
+    
+} )
 
 // Listener (handler) for telegram's /bookmark event
 bot.onText(/\/bookmark/, (msg, match) => {
@@ -24,6 +54,7 @@ bot.onText(/\/bookmark/, (msg, match) => {
     URLs.push(url);
     bot.sendMessage(chatId,'URL has been successfully saved!');
 });
+
 
 
 bot.onText(/\/label/, (msg, match) => {
@@ -71,6 +102,8 @@ bot.on('callback_query', (callbackQuery) => {
     bot.sendMessage(message.chat.id, `URL has been labeled with category "${category}"`);
 });
 
+
+
 // Listener (handler) for showcasing different keyboard layout
 bot.onText(/\/keyboard/, (msg) => {
     bot.sendMessage(msg.chat.id, 'Alternative keybaord layout', {
@@ -82,6 +115,8 @@ bot.onText(/\/keyboard/, (msg) => {
         }
     });
 });
+
+
 
 // Inline keyboard options
 const inlineKeyboard = {
@@ -131,11 +166,14 @@ bot.onText(/\/phone/, (msg) => {
     bot.sendMessage(msg.chat.id, 'Can we get access to your phone number?', requestPhoneKeyboard);
 });
 
+
+
 // Handler for phone number request when user gives permission
 bot.on('contact', async (msg) => {
     const phone = msg.contact.phone_number;
     bot.sendMessage(msg.chat.id, `Phone number saved: ${phone}`);
 })
+
 
 // Listener (handler) for telegram's /start event
 // This event happened when you start the conversation with both by the very first time
